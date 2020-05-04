@@ -4,9 +4,11 @@ namespace Livewire;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Fluent;
+use Illuminate\Foundation\Application;
 use Livewire\Testing\TestableLivewire;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Livewire\Exceptions\ComponentNotFoundException;
+use Livewire\Exceptions\MountMethodMissingException;
 use Livewire\HydrationMiddleware\AddAttributesToRootTagOfHtml;
 
 class LivewireManager
@@ -103,6 +105,8 @@ class LivewireManager
         $resolvedParameters = $this->resolveClassMethodDependencies(
             $params, $instance, 'mount'
         );
+
+        $this->ensureComponentHasMountMethod($instance, $resolvedParameters);
 
         $instance->mount(...$resolvedParameters);
 
@@ -240,7 +244,14 @@ HTML;
     window.livewire_app_url = '{$appUrl}';
     window.livewire_token = '{$csrf}';
 
-    document.addEventListener("DOMContentLoaded", function() {
+    /* Make Alpine wait until Livewire is finished rendering to do its thing. */
+    window.deferLoadingAlpine = function (callback) {
+        window.addEventListener('livewire:load', function () {
+            callback();
+        });
+    };
+
+    document.addEventListener("DOMContentLoaded", function () {
         window.livewire.start();
     });
 
@@ -256,7 +267,7 @@ HTML;
     });
 
     document.addEventListener("turbolinks:before-cache", function() {
-        document.querySelectorAll(`[wire\\\:id]`).forEach(el => {
+        document.querySelectorAll('[wire\\\:id]').forEach(function(el) {
             const component = el.__livewire;
 
             const dataObject = {
@@ -359,5 +370,22 @@ HTML;
     public function isOnVapor()
     {
         return ($_ENV['SERVER_SOFTWARE'] ?? null) === 'vapor';
+    }
+
+    public function isLaravel7()
+    {
+        return Application::VERSION === '7.x-dev' || version_compare(Application::VERSION, '7.0', '>=');
+    }
+
+    private function ensureComponentHasMountMethod($instance, $resolvedParameters)
+    {
+        if (count($resolvedParameters) === 0) return;
+
+        if (is_numeric(key($resolvedParameters))) return;
+
+        throw_unless(
+            method_exists($instance, 'mount'),
+            new MountMethodMissingException($instance->getName())
+        );
     }
 }

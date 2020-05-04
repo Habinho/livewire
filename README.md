@@ -1,5 +1,5 @@
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-51-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-67-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Laravel Livewire
@@ -11,6 +11,31 @@ All contributions are welcomed! (but please submit an issue to make sure the PR 
 Open GitHub issues for all bugs. Ideas and questions belong on the forum: https://forum.laravel-livewire.com/
 
 Contribute to the docs here: https://github.com/livewire/docs
+
+## Release Schedule
+Livewire uses semantic versioning and will use the following release schedule strategy:
+* Urgent bug fix? Release as "patch" version bump right away
+* Patch? Group of small enhancements and bugfixes to be released every ~2 weeks-ish
+* Minor? New features or significant API additions
+* Major? Breaking changes and big strategy changes
+
+> Important Note: All "major" versions will be tagged alongside Laravel's major version release schedule (every 6 months). That does not mean Livewire will release a major version every 6 months, just that when it DOES release a major version, it will coincide with a Laravel release.
+
+## Roadmap
+* Add a `$formData` magic property to pass into submit handler actions: `wire:submit="save($formData)"`
+* Scope loading targets to actions WITH parameters: `<div wire:loading wire:target="updateTodo({{ $todo->id }})">`
+* Remove `wire:poll` setIntervals an element is removed, or when the attribute is removed. #563
+* Implement `wire:model.passive`
+* Add `wire:eval` for latent script tag evaluation
+* Add `wire:append` for appending DOM changes rather than replacing them
+* Allow traits to hook into all lifecycle hooks
+
+## V2 Roadmap
+* Change all in-code references of `livewire` to `wire`? `@wire('foo')`, `artisan wire:make`, `<wire:foo>`
+* Change `window.livewire` to `window.Livewire` (And update Alpine to adapt)
+* Make `->getName()` in `src/Component.php` a static method
+* Use camel-cased accessors for snake-cased properties ($this->foo_bar -> $this->getFooBarProperty) (PR ready here: #690)
+* Maybe remove base `render()` method to allow for DI in method params (PR here: #893)
 
 ## Contributors ✨
 
@@ -68,7 +93,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/ricardogobbosouza"><img src="https://avatars3.githubusercontent.com/u/13064722?v=4" width="100px;" alt=""/><br /><sub><b>Ricardo Gobbo de Souza</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=ricardogobbosouza" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/lucasromanojf"><img src="https://avatars2.githubusercontent.com/u/3661610?v=4" width="100px;" alt=""/><br /><sub><b>lucasromanojf</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=lucasromanojf" title="Code">💻</a></td>
-    <td align="center"><a href="http://laravel.com"><img src="https://avatars3.githubusercontent.com/u/463230?v=4" width="100px;" alt=""/><br /><sub><b>Taylor Otwell</b></sub></a><br /><a href="#financial-taylorotwell" title="Financial">💵</a></td>
+    <td align="center"><a href="http://laravel.com"><img src="https://avatars3.githubusercontent.com/u/463230?v=4" width="100px;" alt=""/><br /><sub><b>Taylor Otwell</b></sub></a><br /><a href="#financial-taylorotwell" title="Financial">💵</a> <a href="https://github.com/livewire/livewire/commits?author=taylorotwell" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/mokhosh"><img src="https://avatars1.githubusercontent.com/u/6499685?v=4" width="100px;" alt=""/><br /><sub><b>Mo Khosh</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=mokhosh" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/caominhduc3108"><img src="https://avatars1.githubusercontent.com/u/17726941?v=4" width="100px;" alt=""/><br /><sub><b>duccm</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=caominhduc3108" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/lalov"><img src="https://avatars3.githubusercontent.com/u/3465648?v=4" width="100px;" alt=""/><br /><sub><b>Lars Erik Løvhaug</b></sub></a><br /><a href="#maintenance-lalov" title="Maintenance">🚧</a></td>
@@ -84,8 +109,28 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://ruudschuurmans.nl"><img src="https://avatars3.githubusercontent.com/u/12184008?v=4" width="100px;" alt=""/><br /><sub><b>Ruud Schuurmans</b></sub></a><br /><a href="#maintenance-ruudschuurmans" title="Maintenance">🚧</a></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://github.com/jgile"><img src="https://avatars3.githubusercontent.com/u/3780633?v=4" width="100px;" alt=""/><br /><sub><b>John Gile</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=jgile" title="Code">💻</a> <a href="https://github.com/livewire/livewire/commits?author=jgile" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/jgile"><img src="https://avatars3.githubusercontent.com/u/3780633?v=4" width="100px;" alt=""/><br /><sub><b>John Gile</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=jgile" title="Code">💻</a> <a href="https://github.com/livewire/livewire/commits?author=jgile" title="Tests">⚠️</a> <a href="#maintenance-jgile" title="Maintenance">🚧</a></td>
     <td align="center"><a href="https://jasonlbeggs.com"><img src="https://avatars2.githubusercontent.com/u/25065083?v=4" width="100px;" alt=""/><br /><sub><b>Jason Beggs</b></sub></a><br /><a href="#maintenance-jasonlbeggs" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="http://fullstackworld.com"><img src="https://avatars0.githubusercontent.com/u/3095445?v=4" width="100px;" alt=""/><br /><sub><b>Ramesh Mhetre</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=mhetreramesh" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/ManojKiranA"><img src="https://avatars0.githubusercontent.com/u/30294553?v=4" width="100px;" alt=""/><br /><sub><b>Manojkiran Appathurai</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=ManojKiranA" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/stevebauman"><img src="https://avatars3.githubusercontent.com/u/6421846?v=4" width="100px;" alt=""/><br /><sub><b>Steve Bauman</b></sub></a><br /><a href="#maintenance-stevebauman" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/code-distortion"><img src="https://avatars2.githubusercontent.com/u/56794290?v=4" width="100px;" alt=""/><br /><sub><b>Tim</b></sub></a><br /><a href="#maintenance-code-distortion" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://www.csrhymes.com/"><img src="https://avatars0.githubusercontent.com/u/4160546?v=4" width="100px;" alt=""/><br /><sub><b>CS Rhymes</b></sub></a><br /><a href="#maintenance-chrisrhymes" title="Maintenance">🚧</a> <a href="https://github.com/livewire/livewire/commits?author=chrisrhymes" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://peen.dev"><img src="https://avatars1.githubusercontent.com/u/5564176?v=4" width="100px;" alt=""/><br /><sub><b>Niels Peen</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=nielspeen" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/salparadise"><img src="https://avatars2.githubusercontent.com/u/4439778?v=4" width="100px;" alt=""/><br /><sub><b>Wojtek Mieszczak</b></sub></a><br /><a href="#maintenance-salparadise" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/i-bajrai"><img src="https://avatars1.githubusercontent.com/u/3688374?v=4" width="100px;" alt=""/><br /><sub><b>Imran Bajerai</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=i-bajrai" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/dododedodonl"><img src="https://avatars2.githubusercontent.com/u/100052?v=4" width="100px;" alt=""/><br /><sub><b>Tom Janssen</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=dododedodonl" title="Code">💻</a></td>
+    <td align="center"><a href="https://DanHarrin.com"><img src="https://avatars2.githubusercontent.com/u/41773797?v=4" width="100px;" alt=""/><br /><sub><b>Dan Harrin</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=DanHarrin" title="Code">💻</a></td>
+    <td align="center"><a href="https://www.codeboutique.com"><img src="https://avatars0.githubusercontent.com/u/247048?v=4" width="100px;" alt=""/><br /><sub><b>Michael Bøcker-Larsen</b></sub></a><br /><a href="#maintenance-mblarsen" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/DavideMoney"><img src="https://avatars0.githubusercontent.com/u/39701809?v=4" width="100px;" alt=""/><br /><sub><b>DavideMoney</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=DavideMoney" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="http://www.dennisvandalen.com"><img src="https://avatars3.githubusercontent.com/u/4375758?v=4" width="100px;" alt=""/><br /><sub><b>Dennis van Dalen</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=dennisvandalen" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/cao-minh-duc"><img src="https://avatars1.githubusercontent.com/u/17726941?v=4" width="100px;" alt=""/><br /><sub><b>Cao Minh Duc</b></sub></a><br /><a href="#maintenance-cao-minh-duc" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://twitter.com/Te7aHoudini"><img src="https://avatars0.githubusercontent.com/u/17250137?v=4" width="100px;" alt=""/><br /><sub><b>Ahmed Mohamed Abd El Ftah</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=Te7a-Houdini" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/yateric"><img src="https://avatars1.githubusercontent.com/u/1567297?v=4" width="100px;" alt=""/><br /><sub><b>Eric Chow</b></sub></a><br /><a href="https://github.com/livewire/livewire/commits?author=yateric" title="Code">💻</a></td>
   </tr>
 </table>
 
@@ -94,3 +139,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+## License
+
+Copyright © Caleb Porzio
+
+Laravel Livewire is open-sourced software licensed under the [MIT license](LICENSE.md).

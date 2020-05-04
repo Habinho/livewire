@@ -114,7 +114,7 @@ class LivewireServiceProvider extends ServiceProvider
         // when a user applies the WithPagination trait to a component.
         $this->loadViewsFrom(
             __DIR__.DIRECTORY_SEPARATOR.'views',
-            config('livewire.view-path', 'livewire')
+            'livewire'
         );
     }
 
@@ -179,7 +179,7 @@ class LivewireServiceProvider extends ServiceProvider
     {
         if (method_exists($this->app['blade.compiler'], 'precompiler')) {
             $this->app['blade.compiler']->precompiler(function ($string) {
-                return (new LivewireTagCompiler)->compile($string);
+                return app(LivewireTagCompiler::class)->compile($string);
             });
         }
     }

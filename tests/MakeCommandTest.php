@@ -18,6 +18,15 @@ class MakeCommandTest extends TestCase
     }
 
     /** @test */
+    public function component_is_created_without_view_by_make_command_with_inline_option()
+    {
+        Artisan::call('make:livewire', ['name' => 'foo', '--inline' => true]);
+
+        $this->assertTrue(File::exists($this->livewireClassesPath('Foo.php')));
+        $this->assertFalse(File::exists($this->livewireViewsPath('foo.blade.php')));
+    }
+
+    /** @test */
     public function component_is_created_by_livewire_make_command()
     {
         Artisan::call('livewire:make', ['name' => 'foo']);
@@ -36,9 +45,18 @@ class MakeCommandTest extends TestCase
     }
 
     /** @test */
-    public function nested_component_is_created_by_make_command()
+    public function dot_nested_component_is_created_by_make_command()
     {
         Artisan::call('make:livewire', ['name' => 'foo.bar']);
+
+        $this->assertTrue(File::exists($this->livewireClassesPath('Foo/Bar.php')));
+        $this->assertTrue(File::exists($this->livewireViewsPath('foo/bar.blade.php')));
+    }
+
+    /** @test */
+    public function forward_slash_nested_component_is_created_by_make_command()
+    {
+        Artisan::call('make:livewire', ['name' => 'foo/bar']);
 
         $this->assertTrue(File::exists($this->livewireClassesPath('Foo/Bar.php')));
         $this->assertTrue(File::exists($this->livewireViewsPath('foo/bar.blade.php')));
@@ -60,6 +78,24 @@ class MakeCommandTest extends TestCase
 
         $this->assertTrue(File::exists($this->livewireClassesPath('FooBar/FooBar.php')));
         $this->assertTrue(File::exists($this->livewireViewsPath('foo-bar/foo-bar.blade.php')));
+    }
+
+    /** @test */
+    public function snake_case_component_is_automatically_converted_by_make_command()
+    {
+        Artisan::call('make:livewire', ['name' => 'text_replace']);
+
+        $this->assertTrue(File::exists($this->livewireClassesPath('TextReplace.php')));
+        $this->assertTrue(File::exists($this->livewireViewsPath('text-replace.blade.php')));
+    }
+
+    /** @test */
+    public function snake_case_component_is_automatically_converted_by_make_command_on_nested_component()
+    {
+        Artisan::call('make:livewire', ['name' => 'TextManager.text_replace']);
+
+        $this->assertTrue(File::exists($this->livewireClassesPath('TextManager/TextReplace.php')));
+        $this->assertTrue(File::exists($this->livewireViewsPath('text-manager/text-replace.blade.php')));
     }
 
     /** @test */

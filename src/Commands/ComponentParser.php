@@ -16,6 +16,7 @@ class ComponentParser
 
     public function __construct($classNamespace, $viewPath, $rawCommand)
     {
+
         $this->baseClassNamespace = $classNamespace;
 
         $classPath = static::generatePathFromNamespace($classNamespace);
@@ -23,9 +24,13 @@ class ComponentParser
         $this->baseClassPath = rtrim($classPath, DIRECTORY_SEPARATOR).'/';
         $this->baseViewPath = rtrim($viewPath, DIRECTORY_SEPARATOR).'/';
 
-        $directories = preg_split('/[.]+/', $rawCommand);
+        $directories = preg_split('/[.\/]+/', $rawCommand);
 
-        $this->component = Str::kebab(array_pop($directories));
+
+        $camelCase = Str::camel(array_pop($directories));
+        $kebabCase = Str::kebab($camelCase);
+
+        $this->component = $kebabCase;
         $this->componentClass = Str::studly($this->component);
 
         $this->directories = array_map([Str::class, 'studly'], $directories);
@@ -41,12 +46,12 @@ class ComponentParser
         return $this->baseClassPath.collect()
             ->concat($this->directories)
             ->push($this->classFile())
-            ->implode(DIRECTORY_SEPARATOR);
+            ->implode('/');
     }
 
     public function relativeClassPath()
     {
-        return Str::replaceFirst(base_path().'/', '', $this->classPath());
+        return Str::replaceFirst(base_path().DIRECTORY_SEPARATOR, '', $this->classPath());
     }
 
     public function classFile()
@@ -69,12 +74,18 @@ class ComponentParser
         return $this->componentClass;
     }
 
-    public function classContents()
+    public function classContents($inline = false)
     {
-        if(File::exists($stubPath = base_path('stubs/livewire.stub'))) {
+        $stubName = $inline ? 'livewire.inline.stub' : 'livewire.stub';
+
+        if(File::exists($stubPath = base_path('stubs/'.$stubName))) {
             $template = file_get_contents($stubPath);
         } else {
-            $template = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'livewire.stub');
+            $template = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.$stubName);
+        }
+
+        if ($inline) {
+            $template = preg_replace('/\[quote\]/', $this->wisdomOfTheTao(), $template);
         }
 
         return preg_replace_array(

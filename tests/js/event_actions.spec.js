@@ -1,5 +1,5 @@
 import { fireEvent, wait } from 'dom-testing-library'
-import { mount, mountAsRoot } from './utils'
+import { mount, mountAsRoot, mountAsRootAndReturn } from './utils'
 const timeout = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 test('basic click', async () => {
@@ -131,6 +131,33 @@ test('polling without specifying method refreshes by default', async () => {
     expect(pollPayload.actionQueue[0].payload.method).toEqual('$refresh')
 })
 
+test('polling will stop if component is conditionally removed', async () => {
+    // @todo: This assertion is hard to make given the current testing utilities.
+    // Leaving this here so that we're aware of the need for it.
+    expect(true).toBeTruthy()
+})
+
+test('polling will stop if directive is removed', async () => {
+    var pollCount = 0
+
+    mountAsRootAndReturn(
+        '<div wire:id="123" wire:initial-data="{}" wire:poll.50ms="someMethod"></div>',
+        '<div wire:id="123" wire:initial-data="{}"></div>',
+        null,
+        () => { pollCount++ }
+    )
+
+    await timeout(49) // 49ms
+    expect(pollCount).toBe(0)
+
+    await timeout(11) // 60ms
+    expect(pollCount).toBe(1)
+
+    // wire:poll is removed, the count remains 1
+    await timeout(50) // 110ms
+    expect(pollCount).toBe(1)
+})
+
 test('polling on root div', async () => {
     var pollHappened = false
     mountAsRoot('<div wire:id="123" wire:initial-data="{}" wire:poll.50ms="someMethod"></div>', () => { pollHappened = true })
@@ -166,11 +193,15 @@ test('init', async () => {
     expect(initHappened).toBeTruthy()
 })
 
-test('form buttons disabled and inputs read-only during submission', async () => {
+test('elements are marked as read-only or disabled during form submissions', async () => {
     var payload
     mount(`
         <form wire:submit.prevent="someMethod">
             <input type="text">
+            <input type="checkbox">
+            <input type="radio">
+            <select></select>
+            <textarea></textarea>
             <button type="submit"></button>
         </form>
     `, i => payload = i)
@@ -182,7 +213,11 @@ test('form buttons disabled and inputs read-only during submission', async () =>
         expect(payload.actionQueue[0].payload.method).toEqual('someMethod')
         expect(payload.actionQueue[0].payload.params).toEqual([])
         expect(document.querySelector('button').disabled).toBeTruthy()
-        expect(document.querySelector('input').readOnly).toBeTruthy()
+        expect(document.querySelector('select').disabled).toBeTruthy()
+        expect(document.querySelector('input[type=checkbox]').disabled).toBeTruthy()
+        expect(document.querySelector('input[type=radio]').disabled).toBeTruthy()
+        expect(document.querySelector('input[type=text]').readOnly).toBeTruthy()
+        expect(document.querySelector('textarea').readOnly).toBeTruthy()
     })
 })
 
@@ -287,5 +322,59 @@ test('action parameter can use double-quotes', async () => {
         expect(payload.actionQueue[0].type).toEqual('callMethod')
         expect(payload.actionQueue[0].payload.method).toEqual('callSomething')
         expect(payload.actionQueue[0].payload.params).toEqual(['double-quotes are ugly', true])
+    })
+})
+
+test('debounce keyup event', async () => {
+    var payload
+    mount('<input wire:keyup.debounce.50ms="someMethod"></button>', i => payload = i)
+
+    fireEvent.keyUp(document.querySelector('input'), { key: 'x' })
+
+    await timeout(1)
+
+    expect(payload).toEqual(undefined)
+
+    await timeout(60)
+
+    expect(payload.actionQueue[0].payload.method).toEqual('someMethod')
+})
+
+test('debounce keyup event with key specified', async () => {
+    var payload
+    mount('<input wire:keyup.x.debounce.50ms="someMethod"></button>', i => payload = i)
+
+    fireEvent.keyUp(document.querySelector('input'), { key: 'k' })
+
+    await timeout(5)
+
+    expect(payload).toEqual(undefined)
+
+    await timeout(60)
+
+    expect(payload).toEqual(undefined)
+
+    fireEvent.keyUp(document.querySelector('input'), { key: 'x' })
+
+    await timeout(5)
+
+    expect(payload).toEqual(undefined)
+
+    await timeout(60)
+
+    expect(payload.actionQueue[0].payload.method).toEqual('someMethod')
+})
+
+test('keydown event', async () => {
+    var payload
+    mount('<input wire:keydown="someMethod"></button>', i => payload = i)
+
+    fireEvent.keyDown(document.querySelector('input'), { key: 'x' })
+
+    await wait(() => {
+
+        expect(payload.actionQueue[0].type).toEqual('callMethod')
+        expect(payload.actionQueue[0].payload.method).toEqual('someMethod')
+        expect(payload.actionQueue[0].payload.params).toEqual([])
     })
 })

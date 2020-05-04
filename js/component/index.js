@@ -174,7 +174,11 @@ export default class Component {
             response.eventQueue.forEach(event => {
                 this.scopedListeners.call(event.event, ...event.params)
 
-                if (event.ancestorsOnly) {
+                if (event.selfOnly) {
+                    store.emitSelf(this.id, event.event, ...event.params)
+                } else if (event.to) {
+                    store.emitTo(event.to, event.event, ...event.params)
+                } else if (event.ancestorsOnly) {
                     store.emitUp(this.el, event.event, ...event.params)
                 } else {
                     store.emit(event.event, ...event.params)
@@ -202,6 +206,7 @@ export default class Component {
     forceRefreshDataBoundElementsMarkedAsDirty(dirtyInputs) {
         this.walk(el => {
             if (el.directives.missing('model')) return
+
             const modelValue = el.directives.get('model').value
 
             if (el.isFocused() && ! dirtyInputs.includes(modelValue)) return
@@ -248,7 +253,7 @@ export default class Component {
                 // This allows the tracking of elements by the "key" attribute, like in VueJs.
                 return node.hasAttribute(`wire:key`)
                     ? node.getAttribute(`wire:key`)
-                    // If no "key", then first check for "wire:id", then "wire:model", then "id"
+                    // If no "key", then first check for "wire:id", then "id"
                     : (node.hasAttribute(`wire:id`)
                         ? node.getAttribute(`wire:id`)
                         : node.id)
@@ -286,6 +291,8 @@ export default class Component {
                     return false
                 }
 
+                store.callHook('beforeElementUpdate', from, to, this)
+
                 const fromEl = new DOMElement(from)
 
                 // Honor the "wire:ignore" attribute or the .__livewire_ignore element property.
@@ -311,6 +318,8 @@ export default class Component {
 
             onElUpdated: (node) => {
                 this.morphChanges.changed.push(node)
+
+                store.callHook('afterElementUpdate', node, this)
             },
 
             onNodeAdded: (node) => {

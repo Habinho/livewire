@@ -1,9 +1,9 @@
+import '@/dom/polyfills/index';
 import componentStore from '@/Store'
 import DOM from "@/dom/dom";
 import Component from "@/component/index";
 import Connection from '@/connection'
 import drivers from '@/connection/drivers'
-import '@/dom/polyfills/index';
 import { dispatch } from './util';
 import LoadingStates from '@/component/LoadingStates'
 import DisableForms from '@/component/DisableForms'
@@ -11,7 +11,6 @@ import DirtyStates from '@/component/DirtyStates'
 import OfflineStates from '@/component/OfflineStates'
 import Polling from '@/component/Polling'
 import UpdateQueryString from '@/component/UpdateQueryString'
-import SupportVueJs from '@/component/SupportVueJs'
 
 class Livewire {
     constructor(options = {}) {
@@ -50,6 +49,10 @@ class Livewire {
         this.components.emit(event, ...params)
     }
 
+    emitTo(name, event, ...params) {
+        this.components.emitTo(name, event, ...params)
+    }
+
     on(event, callback) {
         this.components.on(event, callback)
     }
@@ -72,10 +75,6 @@ class Livewire {
 
         this.onLoadCallback()
         dispatch('livewire:load')
-
-        window.addEventListener('beforeunload', () => {
-            this.components.tearDownComponents()
-        })
 
         document.addEventListener('visibilitychange', () => {
             this.components.livewireIsInBackground = document.hidden
@@ -103,7 +102,6 @@ if (! window.Livewire) {
 }
 
 UpdateQueryString()
-SupportVueJs()
 LoadingStates()
 DisableForms()
 DirtyStates()

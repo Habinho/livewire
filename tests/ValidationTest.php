@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Support\ViewErrorBag;
 use Livewire\Component;
 use Livewire\LivewireManager;
 
@@ -118,19 +119,41 @@ class ValidationTest extends TestCase
     }
 
     /** @test */
-    public function validation_errors_are_flashed_to_session()
+    public function can_validate_only_a_specific_field_with_deeply_nested_array()
     {
         $component = app(LivewireManager::class)->test(ForValidation::class);
 
         $component
+            ->runAction('runDeeplyNestedValidationOnly', 'items.0.baz')
+            ->assertDontSee('items.0.baz field is required')
+            ->runAction('runDeeplyNestedValidationOnly', 'items.1.baz')
+            ->assertSee('items.1.baz field is required');
+    }
+
+    /** @test */
+    public function validation_errors_are_shared_for_all_views()
+    {
+        $component = app(LivewireManager::class)->test(ForValidation::class);
+
+        app('view')->share('errors', $errors = new ViewErrorBag);
+
+        $component
             ->set('bar', '')
             ->call('runValidation')
-            ->assertSee('The bar field is required')
-            ->assertSee('sessionError:The bar field is required')
-            ->set('bar', 'bar')
-            ->call('runValidation')
-            ->assertDontSee('The bar field is required')
-            ->assertDontSee('sessionError:The bar field is required');
+            ->assertSee('sharedError:The bar field is required');
+
+        $this->assertTrue(app('view')->shared('errors') === $errors);
+    }
+
+    /** @test */
+    public function multi_word_validation_rules_are_assertable()
+    {
+        $component = app(LivewireManager::class)->test(ForValidation::class);
+
+        $component
+            ->set('foo', 'bar123&*(O)')
+            ->call('runValidationWithMultiWordRule')
+            ->assertHasErrors(['foo' => 'alpha_dash']);
     }
 }
 
@@ -152,11 +175,28 @@ class ForValidation extends Component
         ]);
     }
 
+    public function runValidationWithMultiWordRule()
+    {
+        $this->validate([
+            'foo' => 'alpha_dash',
+        ]);
+    }
+
     public function runValidationOnly($field)
     {
         $this->validateOnly($field, [
             'foo' => 'required',
             'bar' => 'required',
+        ]);
+    }
+
+    public function runDeeplyNestedValidationOnly($field)
+    {
+        $this->validateOnly($field, [
+            'items' => ['required', 'array'],
+            'items.*' => 'array',
+            'items.*.foo' => ['required', 'string'],
+            'items.*.baz' => ['required', 'string'],
         ]);
     }
 
